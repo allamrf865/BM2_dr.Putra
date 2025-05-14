@@ -1,14 +1,14 @@
-  import plotly.graph_objects as go
-  import plotly.express as px
-  from plotly.subplots import make_subplots
-  import numpy as np
-  import pandas as pd
-  from sklearn.feature_extraction.text import TfidfVectorizer
-  from sklearn.decomposition import LatentDirichletAllocation
-  import networkx as nx
-  from textblob import TextBlob
-  import re
-  from scipy.stats import entropy
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+import networkx as nx
+from textblob import TextBlob
+import re
+from scipy.stats import entropy
 
   class ComprehensiveJournalAnalyzer:
       def __init__(self, text):
