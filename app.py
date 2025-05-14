@@ -200,12 +200,12 @@ class ComprehensiveJournalAnalyzer:
         
         return figs, summary_df
 
-# Example usage for Streamlit
+# Bagian Streamlit
 import streamlit as st
 
 st.title('Comprehensive Journal Quality Analysis')
 
-# Ganti bagian testing dengan kode ini:
+# Tetapkan teks jurnal langsung
 journal_text = """Surgical treatment versus observation in moderate intermittent exotropia (SOMIX): study protocol for a randomized controlled trial
 
 Background: Intermittent exotropia (IXT) is the most common type of strabismus in China, but the best treatment and optimal timing of intervention for IXT remain controversial, particularly for children with moderate IXT who manifest obvious exodeviation frequently but with only partial impairment of binocular single vision. The lack of randomized controlled trial (RCT) evidence means that the true effectiveness of the surgical treatment in curing moderate IXT is still unknown. The SOMIX study has been designed to determine the long-term effectiveness of surgery for the treatment and the natural history of IXT among patients aged 5 to 18 years old.
@@ -214,24 +214,31 @@ Methods/design: A total of 280 patients between 5 and 18 years of age with moder
 
 Discussion: The SOMIX trial will provide important guidance regarding the moderate IXT and its managements and modify the treatment strategies of IXT."""
 
-# Analisis jurnal
-analyzer = ComprehensiveJournalAnalyzer(journal_text)
-figs, summary_df = analyzer.create_visualizations()
+# Tambahkan tombol untuk memulai analisis
+if st.button("Analyze Journal"):
+    # Buat instance analyzer
+    analyzer = ComprehensiveJournalAnalyzer(journal_text)
+    
+    # Dapatkan metrik dan visualisasi
+    figs, summary_df = analyzer.create_visualizations()
+    
+    # Tampilkan visualisasi
+    st.subheader('Interactive Visualizations')
+    for fig in figs:
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Tampilkan tabel metrik
+    st.subheader('Metrics Summary')
+    st.dataframe(summary_df.style.background_gradient(cmap='viridis'))
+    
+    # Hitung dan tampilkan temuan kunci
+    metrics = analyzer.calculate_all_metrics()
+    key_findings = {
+        'Overall Quality': float(np.mean(list(metrics.values()))),
+        'Strongest Areas': [k for k, v in metrics.items() if v > np.percentile(list(metrics.values()), 75)],
+        'Areas for Improvement': [k for k, v in metrics.items() if v < np.percentile(list(metrics.values()), 25)]
+    }
+    
+    st.subheader('Key Findings')
+    st.json(key_findings)
 
-# Tampilkan visualisasi
-for fig in figs:
-    fig.show()
-
-# Tampilkan metrik
-print("\nMetrics Summary:")
-print(summary_df)
-
-# Tampilkan kesimpulan
-metrics = analyzer.calculate_all_metrics()
-key_findings = {
-    'Overall Quality': np.mean(list(metrics.values())),
-    'Strongest Areas': [k for k, v in metrics.items() if v > np.percentile(list(metrics.values()), 75)],
-    'Areas for Improvement': [k for k, v in metrics.items() if v < np.percentile(list(metrics.values()), 25)]
-}
-print("\nKey Findings:")
-print(key_findings)
