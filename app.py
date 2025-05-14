@@ -10,8 +10,8 @@ from textblob import TextBlob
 import re
 from scipy.stats import entropy
 
-  class ComprehensiveJournalAnalyzer:
-      def __init__(self, text):
+class ComprehensiveJournalAnalyzer:
+    def __init__(self, text):
           self.text = text
           self.sentences = text.split('.')
           self.words = text.split()
