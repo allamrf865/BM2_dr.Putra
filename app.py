@@ -205,29 +205,44 @@ import streamlit as st
 
 st.title('Comprehensive Journal Quality Analysis')
 
-analyzer = ComprehensiveJournalAnalyzer(journal_text)
-figs, summary_df = analyzer.create_visualizations()
+# Add text input for journal
+journal_text = st.text_area(
+    "Enter your journal text here:",
+    "Sample text. This is a placeholder. Please enter your journal text here.",
+    height=200
+)
 
-st.subheader('Interactive Visualizations')
-for fig in figs:
-    st.plotly_chart(fig, use_container_width=True)
+if st.button("Analyze"):
+    if journal_text.strip():  # Check if text is not empty
+        analyzer = ComprehensiveJournalAnalyzer(journal_text)
+        figs, summary_df = analyzer.create_visualizations()
 
-st.subheader('Metrics Summary')
-st.dataframe(summary_df.style.background_gradient(cmap='viridis'))
+        st.subheader('Interactive Visualizations')
+        for fig in figs:
+            st.plotly_chart(fig, use_container_width=True)
 
-st.subheader('Conclusions')
-metrics = analyzer.calculate_all_metrics()
-key_findings = {
-    'Overall Quality': np.mean(list(metrics.values())),
-    'Strongest Areas': [k for k, v in metrics.items() if v > np.percentile(list(metrics.values()), 75)],
-    'Areas for Improvement': [k for k, v in metrics.items() if v < np.percentile(list(metrics.values()), 25)]
-}
-st.json(key_findings)
+        st.subheader('Metrics Summary')
+        st.dataframe(summary_df.style.background_gradient(cmap='viridis'))
 
-# For testing without Streamlit
-analyzer = ComprehensiveJournalAnalyzer(journal_text)
+        st.subheader('Conclusions')
+        metrics = analyzer.calculate_all_metrics()
+        key_findings = {
+            'Overall Quality': np.mean(list(metrics.values())),
+            'Strongest Areas': [k for k, v in metrics.items() if v > np.percentile(list(metrics.values()), 75)],
+            'Areas for Improvement': [k for k, v in metrics.items() if v < np.percentile(list(metrics.values()), 25)]
+        }
+        st.json(key_findings)
+    else:
+        st.error("Please enter some text to analyze")
+
+# For testing without Streamlit, uncomment and use this:
+"""
+test_text = "This is a sample journal text. It contains some scientific analysis and methodology. The results show significant findings (p < 0.05). The study design included randomized control groups."
+analyzer = ComprehensiveJournalAnalyzer(test_text)
 figs, summary_df = analyzer.create_visualizations()
 for fig in figs:
     fig.show()
 print("\nMetrics Summary:")
 print(summary_df)
+"""
+
