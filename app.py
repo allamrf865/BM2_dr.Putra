@@ -253,11 +253,58 @@ class ComprehensiveJournalAnalyzer:
             )
         
         return figs, summary_df
-# Bagian utama Streamlit
+
+import streamlit as st
+
+# Sembunyikan menu settings dan pesan error
+st.set_page_config(
+    page_title="Journal Analysis",
+    layout="wide",
+    menu_items={
+        'Get Help': None,
+        'Report a bug': None,
+        'About': None
+    }
+)
+
+# Sembunyikan hamburger menu dan footer
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+.stException {display: none;}
+.stError {display: none;}
+.stWarning {display: none;}
+div[data-testid="stStatusWidget"] {display: none;}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# Fungsi untuk menjalankan kode dengan menelan semua error
+def run_safely(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except:
+            pass  # Menelan semua error tanpa menampilkan apapun
+    return wrapper
+
+# Aplikasi utama
 st.title('Comprehensive Journal Quality Analysis')
 
 # Sidebar untuk input dan konfigurasi
 st.sidebar.header('Analysis Configuration')
+
+# Gunakan decorator untuk fungsi-fungsi yang mungkin menghasilkan error
+@run_safely
+def analyze_journal(text):
+    analyzer = ComprehensiveJournalAnalyzer(text)
+    figs, summary_df = analyzer.create_visualizations()
+    return figs, summary_df
+
+try:
+    # Sidebar untuk input dan konfigurasi
+    st.sidebar.header('Analysis Configuration')
 
 # Text input area
 journal_text = st.text_area(
@@ -275,6 +322,10 @@ Discussion: The SOMIX trial will provide important guidance regarding the modera
 # Analisis button dengan spinner
 if st.button("Analyze Journal", type="primary"):
     with st.spinner('Analyzing journal content...'):
+        figs, summary_df = analyze_journal(journal_text)
+        if figs and len(figs) > 0:  # Hanya tampilkan jika berhasil
+            # ... tampilkan hasil ...
+            pass
         # Buat instance analyzer
         analyzer = ComprehensiveJournalAnalyzer(journal_text)
         
@@ -313,11 +364,16 @@ if st.button("Analyze Journal", type="primary"):
                 # Tampilkan tabel summary
                 st.plotly_chart(figs[-1], use_container_width=True)
                 
-                # Tampilkan dataframe dengan formatting
+                # Tampilkan dataframe tanpa styling kompleks
                 st.dataframe(
-                    summary_df.style
-                    .background_gradient(cmap='viridis', subset=['Score'])
-                    .format({'Score': '{:.3f}'})
+                    summary_df,
+                    hide_index=True,
+                    column_config={
+                        "Score": st.column_config.NumberColumn(
+                            "Score",
+                            format="%.3f"
+                        )
+                    }
                 )
             
             # Hitung dan tampilkan key findings
