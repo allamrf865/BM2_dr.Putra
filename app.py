@@ -205,44 +205,33 @@ import streamlit as st
 
 st.title('Comprehensive Journal Quality Analysis')
 
-# Add text input for journal
-journal_text = st.text_area(
-    "Enter your journal text here:",
-    "Sample text. This is a placeholder. Please enter your journal text here.",
-    height=200
-)
+# Ganti bagian testing dengan kode ini:
+journal_text = """Surgical treatment versus observation in moderate intermittent exotropia (SOMIX): study protocol for a randomized controlled trial
 
-if st.button("Analyze"):
-    if journal_text.strip():  # Check if text is not empty
-        analyzer = ComprehensiveJournalAnalyzer(journal_text)
-        figs, summary_df = analyzer.create_visualizations()
+Background: Intermittent exotropia (IXT) is the most common type of strabismus in China, but the best treatment and optimal timing of intervention for IXT remain controversial, particularly for children with moderate IXT who manifest obvious exodeviation frequently but with only partial impairment of binocular single vision. The lack of randomized controlled trial (RCT) evidence means that the true effectiveness of the surgical treatment in curing moderate IXT is still unknown. The SOMIX study has been designed to determine the long-term effectiveness of surgery for the treatment and the natural history of IXT among patients aged 5 to 18 years old.
 
-        st.subheader('Interactive Visualizations')
-        for fig in figs:
-            st.plotly_chart(fig, use_container_width=True)
+Methods/design: A total of 280 patients between 5 and 18 years of age with moderate IXT will be enrolled at Zhongshan Ophthalmic Center, Sun Yat-sen University, Guangzhou, China. After initial clinical assessment, all participants will be randomized to receive surgical treatment or observation, and then be followed up for 5 years. The primary objective is to compare the cure rate of IXT between the surgical treatment and observation group. The secondary objectives are to identify the predictive factors affecting long-term outcomes in each group and to observe the natural course of IXT.
 
-        st.subheader('Metrics Summary')
-        st.dataframe(summary_df.style.background_gradient(cmap='viridis'))
+Discussion: The SOMIX trial will provide important guidance regarding the moderate IXT and its managements and modify the treatment strategies of IXT."""
 
-        st.subheader('Conclusions')
-        metrics = analyzer.calculate_all_metrics()
-        key_findings = {
-            'Overall Quality': np.mean(list(metrics.values())),
-            'Strongest Areas': [k for k, v in metrics.items() if v > np.percentile(list(metrics.values()), 75)],
-            'Areas for Improvement': [k for k, v in metrics.items() if v < np.percentile(list(metrics.values()), 25)]
-        }
-        st.json(key_findings)
-    else:
-        st.error("Please enter some text to analyze")
-
-# For testing without Streamlit, uncomment and use this:
-"""
-test_text = "This is a sample journal text. It contains some scientific analysis and methodology. The results show significant findings (p < 0.05). The study design included randomized control groups."
-analyzer = ComprehensiveJournalAnalyzer(test_text)
+# Analisis jurnal
+analyzer = ComprehensiveJournalAnalyzer(journal_text)
 figs, summary_df = analyzer.create_visualizations()
+
+# Tampilkan visualisasi
 for fig in figs:
     fig.show()
+
+# Tampilkan metrik
 print("\nMetrics Summary:")
 print(summary_df)
-"""
 
+# Tampilkan kesimpulan
+metrics = analyzer.calculate_all_metrics()
+key_findings = {
+    'Overall Quality': np.mean(list(metrics.values())),
+    'Strongest Areas': [k for k, v in metrics.items() if v > np.percentile(list(metrics.values()), 75)],
+    'Areas for Improvement': [k for k, v in metrics.items() if v < np.percentile(list(metrics.values()), 25)]
+}
+print("\nKey Findings:")
+print(key_findings)
